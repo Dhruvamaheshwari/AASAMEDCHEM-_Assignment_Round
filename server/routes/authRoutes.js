@@ -16,6 +16,7 @@ const validateLogin = [
 ];
 
 router.post('/register', validateRegister, authController.register);
+router.post('/admin-register', validateRegister, authController.adminRegister);
 router.post('/login', validateLogin, authController.login);
 router.post('/logout', authController.logout);
 

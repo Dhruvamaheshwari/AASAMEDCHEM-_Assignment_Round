@@ -4,14 +4,13 @@ import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { Activity } from 'lucide-react';
 
-const Register = () => {
+const AdminRegister = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('SELLER');
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { register } = useContext(AuthContext);
+  const { adminRegister } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
@@ -19,7 +18,7 @@ const Register = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const user = await register(name, email, password, role);
+      const user = await adminRegister(name, email, password);
       if (user.role === 'ADMIN') {
         navigate('/admin/products');
       } else {
@@ -27,7 +26,7 @@ const Register = () => {
       }
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.error || 'Enrollment failed. Please check your inputs.');
+      setError(err.response?.data?.error || 'Admin enrollment failed. Please check your inputs.');
     } finally {
       setIsLoading(false);
     }
@@ -39,14 +38,14 @@ const Register = () => {
         <div className="flex justify-center mb-8">
             <div className="flex items-center gap-3 text-primary">
                 <Activity className="w-10 h-10" />
-                <span className="font-bold text-3xl tracking-tight text-foreground">PharmaSync</span>
+                <span className="font-bold text-3xl tracking-tight text-foreground">PharmaSync Admin</span>
             </div>
         </div>
         
         <div className="rounded-2xl border bg-card text-card-foreground shadow-2xl border-primary/10 overflow-hidden">
           <div className="flex flex-col space-y-1.5 p-8 pb-6 text-center border-b bg-muted/10">
-            <h3 className="text-2xl font-bold tracking-tight">Facility Enrollment</h3>
-            <p className="text-sm text-muted-foreground mt-1">Register your clinic or pharmacy to access wholesale dispensations.</p>
+            <h3 className="text-2xl font-bold tracking-tight">Admin System Access</h3>
+            <p className="text-sm text-muted-foreground mt-1">Register an administrator account for platform management.</p>
           </div>
           <div className="p-8 pt-6">
             {error && (
@@ -56,11 +55,11 @@ const Register = () => {
             )}
             <form onSubmit={handleRegister} className="space-y-5">
               <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-semibold text-foreground">Facility Name / Admin</label>
+                <label htmlFor="name" className="text-sm font-semibold text-foreground">Admin Name</label>
                 <input
                   id="name"
                   type="text"
-                  placeholder="General Hospital"
+                  placeholder="System Administrator"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -68,11 +67,11 @@ const Register = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-semibold text-foreground">Official Email</label>
+                <label htmlFor="email" className="text-sm font-semibold text-foreground">Admin Email</label>
                 <input
                   id="email"
                   type="email"
-                  placeholder="admin@hospital.org"
+                  placeholder="admin@pharmasync.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -92,24 +91,12 @@ const Register = () => {
                   className="flex h-12 w-full rounded-lg border border-input bg-background px-4 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm"
                 />
               </div>
-              <div className="space-y-2">
-                <label htmlFor="role" className="text-sm font-semibold text-foreground">Account Type</label>
-                <select
-                  id="role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="flex h-12 w-full rounded-lg border border-input bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm"
-                >
-                  <option value="SELLER">Pharmacy / Clinic (Seller)</option>
-                  <option value="ADMIN">System Administrator</option>
-                </select>
-              </div>
               <button 
                 type="submit" 
                 disabled={isLoading}
                 className="inline-flex w-full items-center justify-center rounded-lg text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-4 transition-all disabled:opacity-50 shadow-md hover:shadow-lg mt-2"
               >
-                {isLoading ? "Processing..." : "Complete Enrollment"}
+                {isLoading ? "Processing..." : "Create Admin Account"}
               </button>
             </form>
           </div>
@@ -125,4 +112,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default AdminRegister;

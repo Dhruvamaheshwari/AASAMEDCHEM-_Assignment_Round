@@ -25,6 +25,8 @@ app.use(
   cors({
     origin: [
       "https://aasamedchem-assignment-round-tqzs.vercel.app",
+      "https://aasamedchem-assignment-round.vercel.app",
+      "http://localhost:5173"
     ],
     credentials: true,
   })
@@ -69,5 +71,11 @@ app.use('/api/v2/users', userRoutes);
 
 // Global Error Handler
 app.use(errorHandler);
+
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 module.exports = app;

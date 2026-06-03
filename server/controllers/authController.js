@@ -13,7 +13,7 @@ const register = async (req, res, next) => {
   }
 
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name, role } = req.body;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -24,13 +24,15 @@ const register = async (req, res, next) => {
     // Hash the password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create the user with SELLER role
+    // Create the user with requested role or default to SELLER
+    const userRole = role === "ADMIN" ? "ADMIN" : "SELLER";
+    
     const newUser = await prisma.user.create({
       data: {
         email,
         passwordHash,
         name,
-        role: "SELLER",
+        role: userRole,
       },
     });
 
@@ -50,6 +52,62 @@ const register = async (req, res, next) => {
 
     res.status(201).json({
       message: "SELLER registered successfully",
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const adminRegister = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { email, password, name } = req.body;
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: "User with this email already exists" });
+    }
+
+    // Hash the password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Create the user with ADMIN role
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        passwordHash,
+        name,
+        role: "ADMIN",
+      },
+    });
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: newUser.id, email: newUser.email, role: newUser.role },
+      JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
+    });
+
+    res.status(201).json({
+      message: "ADMIN registered successfully",
       user: {
         id: newUser.id,
         name: newUser.name,
@@ -120,6 +178,7 @@ const logout = async (req, res, next) => {
 
 module.exports = {
   register,
+  adminRegister,
   login,
   logout
 };
