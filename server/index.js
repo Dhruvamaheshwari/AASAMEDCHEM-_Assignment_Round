@@ -115,6 +115,105 @@ app.get(
   },
 );
 
+// --- PRODUCT CRUD ROUTES ---
+
+// GET /api/products (Public or Protected based on your needs, making it public for search/filtering)
+app.get("/api/products", async (req, res) => {
+  try {
+    const { search } = req.query;
+    const products = await prisma.product.findMany({
+      where:
+        search ?
+          {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { sku: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : undefined,
+    });
+    res.json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/products (ADMIN only)
+app.post(
+  "/api/products",
+  authenticate,
+  authorize("ADMIN"),
+  async (req, res) => {
+    try {
+      const { name, sku, description, baseUnit, basePrice, stockQuantity } =
+        req.body;
+      const product = await prisma.product.create({
+        data: {
+          name,
+          sku,
+          description,
+          baseUnit,
+          basePrice,
+          stockQuantity: stockQuantity || 0,
+        },
+      });
+      res.status(201).json(product);
+    } catch (error) {
+      console.error("Error creating product:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
+
+// PUT /api/products/:id (ADMIN only)
+app.put(
+  "/api/products/:id",
+  authenticate,
+  authorize("ADMIN"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name, sku, description, baseUnit, basePrice, stockQuantity } =
+        req.body;
+      const product = await prisma.product.update({
+        where: { id: parseInt(id) },
+        data: {
+          name,
+          sku,
+          description,
+          baseUnit,
+          basePrice,
+          stockQuantity,
+        },
+      });
+      res.json(product);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
+
+// DELETE /api/products/:id (ADMIN only)
+app.delete(
+  "/api/products/:id",
+  authenticate,
+  authorize("ADMIN"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      await prisma.product.delete({
+        where: { id: parseInt(id) },
+      });
+      res.json({ message: "Product deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
