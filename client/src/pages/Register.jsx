@@ -2,18 +2,19 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
-const Login = () => {
+const Register = () => {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    const { login } = useContext(AuthContext);
+    const { register } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const handleLogin = async (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
         setError(null);
         try {
-            const user = await login(email, password);
+            const user = await register(name, email, password);
             if (user.role === 'ADMIN') {
                 navigate('/admin/products');
             } else {
@@ -21,24 +22,25 @@ const Login = () => {
             }
         } catch (err) {
             console.error(err);
-            setError(err.response?.data?.error || 'Login failed');
+            setError(err.response?.data?.error || 'Registration failed');
         }
     };
 
     return (
         <div style={{ padding: 20 }}>
-            <h2>Login</h2>
+            <h2>Register</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', width: 300, gap: 10 }}>
+            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', width: 300, gap: 10 }}>
+                <input type="text" placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
                 <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-                <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-                <button type="submit">Login</button>
+                <input type="password" placeholder="Password (min 6 chars)" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
+                <button type="submit">Register</button>
             </form>
             <p style={{ marginTop: 15 }}>
-                Don't have an account? <Link to="/register">Register here</Link>
+                Already have an account? <Link to="/login">Login here</Link>
             </p>
         </div>
     );
 };
 
-export default Login;
+export default Register;

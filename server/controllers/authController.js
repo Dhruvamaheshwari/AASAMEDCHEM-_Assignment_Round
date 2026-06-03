@@ -34,6 +34,20 @@ const register = async (req, res, next) => {
       },
     });
 
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: newUser.id, email: newUser.email, role: newUser.role },
+      JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
+    });
+
     res.status(201).json({
       message: "SELLER registered successfully",
       user: {
@@ -74,9 +88,15 @@ const login = async (req, res, next) => {
       { expiresIn: "1d" },
     );
 
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
+    });
+
     res.json({
       message: "Login successful",
-      token,
       user: {
         id: Puser.id,
         name: Puser.name,
@@ -91,9 +111,8 @@ const login = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
-    // In JWT, logout is mostly handled client-side by deleting the token.
-    // If using cookies, we could clear it here.
-    res.json({ message: "Logout successful. Please remove token on client side." });
+    res.clearCookie('token');
+    res.json({ message: "Logout successful." });
   } catch (error) {
     next(error);
   }
