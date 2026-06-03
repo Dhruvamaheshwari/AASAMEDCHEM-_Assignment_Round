@@ -12,6 +12,7 @@ const errorHandler = require("./middleware/errorHandler");
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 const db = require("./config/db");
 
 const prisma = new PrismaClient();
@@ -36,6 +37,9 @@ app.get(
 
 // --- PRODUCT CRUD ROUTES ---
 app.use("/api/products", productRoutes);
+
+// --- ORDER / QUOTATION ROUTES ---
+app.use("/api/orders", orderRoutes);
 
 // Health Check Route
 app.get('/health', async (req, res, next) => {
