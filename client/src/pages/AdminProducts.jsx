@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 
 const AdminProducts = () => {
     const [products, setProducts] = useState([]);
     const [formData, setFormData] = useState({ id: null, name: '', sku: '', description: '', baseUnit: '', basePrice: 0, stockQuantity: 0 });
 
     const token = localStorage.getItem('token');
-    const config = {
-        headers: { Authorization: `Bearer ${token}` }
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
     };
 
     const fetchProducts = async () => {
         try {
-            const res = await axios.get('/api/products');
-            setProducts(res.data);
+            const res = await fetch('/api/products');
+            if (!res.ok) throw new Error('Failed to fetch products');
+            const data = await res.json();
+            setProducts(data);
         } catch (err) {
             console.error(err);
         }
@@ -30,19 +32,23 @@ const AdminProducts = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            if (formData.id) {
-                await axios.put(`/api/products/${formData.id}`, {
-                    ...formData,
-                    basePrice: parseFloat(formData.basePrice),
-                    stockQuantity: parseFloat(formData.stockQuantity)
-                }, config);
-            } else {
-                await axios.post('/api/products', {
-                    ...formData,
-                    basePrice: parseFloat(formData.basePrice),
-                    stockQuantity: parseFloat(formData.stockQuantity)
-                }, config);
-            }
+            const payload = {
+                ...formData,
+                basePrice: parseFloat(formData.basePrice),
+                stockQuantity: parseFloat(formData.stockQuantity)
+            };
+
+            const url = formData.id ? `/api/products/${formData.id}` : '/api/products';
+            const method = formData.id ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+                method,
+                headers,
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error('Failed to save product');
+
             setFormData({ id: null, name: '', sku: '', description: '', baseUnit: '', basePrice: 0, stockQuantity: 0 });
             fetchProducts();
         } catch (err) {
@@ -57,7 +63,13 @@ const AdminProducts = () => {
 
     const deleteProduct = async (id) => {
         try {
-            await axios.delete(`/api/products/${id}`, config);
+            const res = await fetch(`/api/products/${id}`, {
+                method: 'DELETE',
+                headers
+            });
+
+            if (!res.ok) throw new Error('Failed to delete product');
+            
             fetchProducts();
         } catch (err) {
             console.error(err);
