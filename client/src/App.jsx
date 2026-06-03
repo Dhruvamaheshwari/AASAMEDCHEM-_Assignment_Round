@@ -9,7 +9,8 @@ import AdminInventory from './pages/admin/Inventory';
 import SellerDashboard from './pages/seller/Dashboard';
 import NewQuotation from './pages/seller/NewQuotation';
 import MyQuotations from './pages/seller/MyQuotations';
-import './App.css';
+import MainLayout from './components/layout/MainLayout';
+import './index.css';
 
 const ProtectedRoute = ({ children, roles }) => {
   const { user, loading } = useContext(AuthContext);
@@ -34,39 +35,41 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       
-      {/* Admin Routes */}
-      <Route path="/admin/products" element={
-        <ProtectedRoute roles={['ADMIN']}>
-          <AdminProducts />
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/orders" element={
-        <ProtectedRoute roles={['ADMIN']}>
-          <AdminOrders />
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/inventory" element={
-        <ProtectedRoute roles={['ADMIN']}>
-          <AdminInventory />
-        </ProtectedRoute>
-      } />
+      <Route element={<MainLayout />}>
+        {/* Admin Routes */}
+        <Route path="/admin/products" element={
+          <ProtectedRoute roles={['ADMIN']}>
+            <AdminProducts />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/orders" element={
+          <ProtectedRoute roles={['ADMIN']}>
+            <AdminOrders />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/inventory" element={
+          <ProtectedRoute roles={['ADMIN']}>
+            <AdminInventory />
+          </ProtectedRoute>
+        } />
 
-      {/* Seller Routes */}
-      <Route path="/seller/dashboard" element={
-        <ProtectedRoute roles={['SELLER', 'ADMIN']}>
-          <SellerDashboard />
-        </ProtectedRoute>
-      } />
-      <Route path="/seller/new-quotation" element={
-        <ProtectedRoute roles={['SELLER', 'ADMIN']}>
-          <NewQuotation />
-        </ProtectedRoute>
-      } />
-      <Route path="/seller/my-quotations" element={
-        <ProtectedRoute roles={['SELLER', 'ADMIN']}>
-          <MyQuotations />
-        </ProtectedRoute>
-      } />
+        {/* Seller Routes */}
+        <Route path="/seller/dashboard" element={
+          <ProtectedRoute roles={['SELLER', 'ADMIN']}>
+            <SellerDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/seller/new-quotation" element={
+          <ProtectedRoute roles={['SELLER', 'ADMIN']}>
+            <NewQuotation />
+          </ProtectedRoute>
+        } />
+        <Route path="/seller/my-quotations" element={
+          <ProtectedRoute roles={['SELLER', 'ADMIN']}>
+            <MyQuotations />
+          </ProtectedRoute>
+        } />
+      </Route>
     </Routes>
   );
 };
