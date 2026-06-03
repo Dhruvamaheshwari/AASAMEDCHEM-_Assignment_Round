@@ -100,8 +100,8 @@ const Register = () => {
                   onChange={(e) => setRole(e.target.value)}
                   className="flex h-12 w-full rounded-lg border border-input bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm"
                 >
-                  <option value="SELLER">Pharmacy / Clinic (Seller)</option>
-                  <option value="ADMIN">System Administrator</option>
+                  <option value="SELLER">Buyer</option>
+                  <option value="ADMIN">Seller</option>
                 </select>
               </div>
               <button 
