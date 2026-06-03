@@ -8,6 +8,9 @@ const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
 const authenticate = require("./middleware/auth");
 const authorize = require("./middleware/roleCheck");
+const errorHandler = require("./middleware/errorHandler");
+const userRoutes = require("./routes/userRoutes");
+const db = require("./config/db");
 
 const prisma = new PrismaClient();
 const app = express();
@@ -214,6 +217,20 @@ app.delete(
   },
 );
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+// Health Check Route
+app.get('/health', async (req, res, next) => {
+  try {
+    const result = await db.query('SELECT NOW()');
+    res.json({ status: 'ok', db_time: result.rows[0].now });
+  } catch (error) {
+    next(error);
+  }
 });
+
+// New pg.Pool MVC Routes
+app.use('/api/v2/users', userRoutes);
+
+// Global Error Handler
+app.use(errorHandler);
+
+module.exports = app;
