@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import AdminProducts from './pages/AdminProducts';
+import DashboardProducts from './pages/DashboardProducts';
 
 const ProtectedAdminRoute = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -26,6 +27,7 @@ function App() {
             </ProtectedAdminRoute>
           } 
         />
+        <Route path="/dashboard/products" element={<DashboardProducts />} />
         {/* Default redirect to login for now */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
