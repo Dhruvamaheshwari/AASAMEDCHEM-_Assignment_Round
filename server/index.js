@@ -13,6 +13,7 @@ const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const inventoryRoutes = require("./routes/inventoryRoutes");
 const db = require("./config/db");
 
 const prisma = new PrismaClient();
@@ -40,6 +41,9 @@ app.use("/api/products", productRoutes);
 
 // --- ORDER / QUOTATION ROUTES ---
 app.use("/api/orders", orderRoutes);
+
+// --- INVENTORY ROUTES ---
+app.use("/api/inventory", inventoryRoutes);
 
 // Health Check Route
 app.get('/health', async (req, res, next) => {

@@ -36,10 +36,18 @@ const deleteProduct = async (id) => {
     });
 };
 
+const updateStockQuantity = async (id, newQuantity) => {
+    return await prisma.product.update({
+        where: { id: parseInt(id) },
+        data: { stockQuantity: newQuantity }
+    });
+};
+
 module.exports = {
     createProduct,
     getAllProducts,
     getProductById,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    updateStockQuantity
 };
